@@ -27,13 +27,14 @@ public class WhenStatementParser extends StatementParser{
         super(parent);
     }
     
-    // Synchronization set for THEN.
+    // Synchronization set for ALSO.
     private static final EnumSet<PascalTokenType> ALSO_SET =
         StatementParser.STMT_START_SET.clone();
     static {
         ALSO_SET.add(ALSO);
         ALSO_SET.addAll(StatementParser.STMT_FOLLOW_SET);
     }
+    
     /**
      * Parse an WHEN statement.
      * @param token the initial token.
@@ -47,6 +48,11 @@ public class WhenStatementParser extends StatementParser{
 
         // Create an WHEN node.
         ICodeNode whenNode = ICodeFactory.createICodeNode(ICodeNodeTypeImpl.WHEN);
+        
+        //
+        //while(token.getType()!= OTHERWISE) {
+        	
+        //}
 
         // Parse the expression.
         // The WHEN node adopts the expression subtree as its first child.
@@ -67,6 +73,16 @@ public class WhenStatementParser extends StatementParser{
         StatementParser statementParser = new StatementParser(this);
         whenNode.addChild(statementParser.parse(token));
         token = currentToken();
+        
+        // Look for the semicolon between IF branches.
+        if (token.getType() == SEMICOLON) {
+            token = nextToken();  // consume the ;
+        }
+
+        // If at the start of the next statement, then missing a semicolon.
+        else if (ALSO_SET.contains(token.getType())) {
+            errorHandler.flag(token, MISSING_SEMICOLON, this);
+        }
 
         // Look for an OTHERWISE.
         if (token.getType() == OTHERWISE) {
@@ -75,6 +91,14 @@ public class WhenStatementParser extends StatementParser{
             // Parse the OTHERWISE statement.
             // The WHEN node adopts the statement subtree as its third child.
             whenNode.addChild(statementParser.parse(token));
+        }
+        
+        // Look for the END token.
+        if (token.getType() == END) {
+            token = nextToken();  // consume END
+        }
+        else {
+            errorHandler.flag(token, MISSING_END, this);
         }
 
         return whenNode;

@@ -38,8 +38,9 @@ public class StatementParser extends PascalParserTD
 
     // Synchronization set for following a statement.
     //ADDED OTHERWISE
+    //ADDED ALSO
     protected static final EnumSet<PascalTokenType> STMT_FOLLOW_SET =
-        EnumSet.of(SEMICOLON, END, ELSE, OTHERWISE, UNTIL, DOT);
+        EnumSet.of(SEMICOLON, END, ELSE, ALSO, OTHERWISE, UNTIL, DOT);
 
     /**
      * Parse a statement.
